@@ -1,5 +1,11 @@
 package bgu.spl.net.api;
 
+/**
+ * This interface replaces the MessagingProtcol interface.
+ * It exists to support peer 2 peer messaging via the connections interface.
+ * @param <T>
+ */
+
 public interface MessagingProtocol<T> {
  
     /**
