@@ -16,6 +16,7 @@ public class ConnectionsImp<T> implements Connections<T> {
 
     @Override
     public void send(int connId, T msg) {
+        //TODO: what todo when there is no connection with this connId
         connectionHandlers.get(connId).send(msg);
     }
 
@@ -31,3 +32,4 @@ public class ConnectionsImp<T> implements Connections<T> {
         connectionHandlers.remove(connId);
     }
 }
+
