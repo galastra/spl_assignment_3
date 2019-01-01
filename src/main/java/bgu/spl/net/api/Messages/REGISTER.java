@@ -7,6 +7,7 @@ import java.util.List;
 
 public class REGISTER extends Message {
     public final short Opcode=1;
+    public final int ExpectedZeroBytes=2;
     private String UserName;
     private String PassWord;
 
@@ -26,7 +27,12 @@ public class REGISTER extends Message {
     }
 
     @Override
-    public int getOpCode() {
+    public int getExpectedZeroBytes() {
+        return ExpectedZeroBytes;
+    }
+
+    @Override
+    public short getOpCode() {
         return Opcode;
     }
 

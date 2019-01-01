@@ -1,17 +1,19 @@
 package bgu.spl.net.api;
 
+import java.util.LinkedList;
+
 public class Client {
     private String Name;
     private String Password;
     private int NumPosts;
-    private int NumFollowers;//maybe a list
+    private LinkedList<String> Followers;//maybe a list
     private int NumFollowing;//maybe a list
     private boolean IsConnected;
 
     public Client(){
         Name="";
         Password="";
-        NumFollowers=0;
+        Followers=new LinkedList<>();
         NumFollowing=0;
         NumPosts=0;
         IsConnected=false;
@@ -25,8 +27,25 @@ public class Client {
         return NumFollowing;
     }
 
-    public int getNumFollowers() {
-        return NumFollowers;
+    public LinkedList<String> getFollowers() {
+        return Followers;
+    }
+
+    public boolean AddFollower(String Name)
+    {
+        if(Followers.contains(Name))
+            return false;
+        Followers.add(Name);
+        return true;
+    }
+
+    public boolean RemoveFollower(String Name){
+        if(Followers.contains(Name))
+        {
+            Followers.remove(Name);
+            return true;
+        }
+        return false;
     }
 
     public boolean getIsConncted(){

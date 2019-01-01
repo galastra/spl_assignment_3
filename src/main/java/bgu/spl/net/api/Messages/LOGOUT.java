@@ -1,6 +1,8 @@
 package bgu.spl.net.api.Messages;
 
 import bgu.spl.net.api.Client;
+import bgu.spl.net.api.Messages.ServerToClient.ACK;
+import bgu.spl.net.api.Messages.ServerToClient.ERROR;
 import bgu.spl.net.api.Messages.ServerToClient.ServerMsg;
 
 import java.util.List;
@@ -11,18 +13,19 @@ public class LOGOUT extends Message {
     public LOGOUT(){}
 
     @Override
-    public void decode(List<Byte> list) {
-        // TODO: 30-Dec-18  
+    public boolean decodeNextByte(byte nextByte) {
+        return true;
     }
 
     @Override
-    public int getOpCode() {
+    public short getOpCode() {
         return Opcode;
     }
 
     @Override
     public ServerMsg process(Client c) {
-        return super.process(c);
-        // TODO: 31-Dec-18  
+        if(c.getIsConncted())
+            return new ACK(Opcode);
+        return new ERROR(Opcode);
     }
 }

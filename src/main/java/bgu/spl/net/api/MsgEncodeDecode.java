@@ -9,75 +9,69 @@ import java.util.List;
 public class MsgEncodeDecode implements MessageEncoderDecoder<Message> {
     private List<Byte> arr;
     private short OpCode;
-    private int ExpectedBytes;
+    private Message CurrentMsg;
     public MsgEncodeDecode(){
 
     }
 
     @Override
     public Message decodeNextByte(byte nextByte) {
-        if(arr.size()<2)
-            arr.add(nextByte);
-        else if(OpCode==0)
+        if(OpCode==0)
         {
-            ByteBuffer bb=ByteBuffer.allocate(2);
-            bb.order(ByteOrder.LITTLE_ENDIAN);
-            bb.put(arr.remove(0));
-            bb.put(arr.remove(0));
-            OpCode=bb.getShort();
-
+            if(arr.size()==2)
+            {
+                ByteBuffer bb=ByteBuffer.allocate(2);
+                bb.order(ByteOrder.LITTLE_ENDIAN);
+                bb.put(arr.remove(0));
+                bb.put(arr.remove(0));
+                OpCode=bb.getShort();
+            }
+            else
+                arr.add(nextByte);
         }
-        else if(ExpectedBytes>0)
-        {
-            arr.add(nextByte);
-            ExpectedBytes--;
-        }
-        else
-        {
-            Message msg=getMassage(OpCode);
-            msg.decode(arr);
-            return msg;
+        else{
+           if(CurrentMsg.decodeNextByte(nextByte))
+               return CurrentMsg;
         }
         return null;
     }
 
     @Override
     public byte[] encode(Message message) {
-        return new byte[0];
+        return message.encode();
     }
 
-    private Message getMassage(short OpCode)
+    private void getMassage(short OpCode)
     {
-        Message ToReturn=null;
+
         switch (OpCode){
             case 1:
-                ExpectedBytes=5;//HOW MANY BYTES I should expect from this message
-                ToReturn=new REGISTER();
+                CurrentMsg=new REGISTER();
                 break;
             case 2:
-                ToReturn=new LOGIN();
+                CurrentMsg=new LOGIN();
                 break;
             case 3:
-                ToReturn=new LOGOUT();
+                CurrentMsg=new LOGOUT();
                 break;
             case 4:
-                ToReturn=new FOLLOW();
+                CurrentMsg=new FOLLOW();
                 break;
             case 5:
-                ToReturn=new POST();
+                CurrentMsg=new POST();
                 break;
             case 6:
-                ToReturn=new PM();
+                CurrentMsg=new PM();
                 break;
             case 7:
-                ToReturn=new USERLIST();
+                CurrentMsg=new USERLIST();
                 break;
             case 8:
-                ToReturn=new STAT();
+                CurrentMsg=new STAT();
                 break;
             //no need to include server to client messages
 
         }
-        return ToReturn;
+
     }
 }

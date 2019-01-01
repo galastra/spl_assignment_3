@@ -2,10 +2,10 @@ package bgu.spl.net.api.Messages.ServerToClient;
 
 import java.io.Serializable;
 
-public class ACK<T> extends ServerMsg {
+public class ACK extends ServerMsg {
     public final short Opcode=10;
-    private short MessageOpcode;
-    private T Optional;
+    protected short MessageOpcode;
+
 
     public ACK(short MsgOpCode){
         MessageOpcode=MsgOpCode;
@@ -17,10 +17,6 @@ public class ACK<T> extends ServerMsg {
 
     public short getMessageOpcode() {
         return MessageOpcode;
-    }
-
-    public T getOptional() {
-        return Optional;
     }
 
 }
