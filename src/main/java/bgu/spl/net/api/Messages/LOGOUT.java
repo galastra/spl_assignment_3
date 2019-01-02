@@ -3,9 +3,6 @@ package bgu.spl.net.api.Messages;
 import bgu.spl.net.api.Client;
 import bgu.spl.net.api.Messages.ServerToClient.ACK;
 import bgu.spl.net.api.Messages.ServerToClient.ERROR;
-import bgu.spl.net.api.Messages.ServerToClient.ServerMsg;
-
-import java.util.List;
 
 public class LOGOUT extends Message {
     public final short Opcode=3;
@@ -23,9 +20,10 @@ public class LOGOUT extends Message {
     }
 
     @Override
-    public ServerMsg process(Client c) {
+    public Message process(Client c) {
         if(c.getIsConncted())
             return new ACK(Opcode);
+        // TODO: 02-Jan-19 should remove client from active users list in connections class 
         return new ERROR(Opcode);
     }
 }

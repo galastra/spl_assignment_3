@@ -11,7 +11,7 @@ public class MsgEncodeDecode implements MessageEncoderDecoder<Message> {
     private short OpCode;
     private Message CurrentMsg;
     public MsgEncodeDecode(){
-
+        CurrentMsg=new Message();
     }
 
     @Override
@@ -25,19 +25,20 @@ public class MsgEncodeDecode implements MessageEncoderDecoder<Message> {
                 bb.put(arr.remove(0));
                 bb.put(arr.remove(0));
                 OpCode=bb.getShort();
+                getMassage(OpCode);
             }
             else
                 arr.add(nextByte);
         }
-        else{
-           if(CurrentMsg.decodeNextByte(nextByte))
+           if(CurrentMsg.decodeNextByte(nextByte))//should also deal with msg like USERLIST with only Opcode being sent
                return CurrentMsg;
-        }
+
         return null;
     }
 
     @Override
     public byte[] encode(Message message) {
+        // TODO: 02-Jan-19 those msg will be only a server to client msg
         return message.encode();
     }
 

@@ -48,6 +48,20 @@ public class Client {
         return false;
     }
 
+    public void Register(String Name,String Password)
+    {
+        this.Name=Name;
+        this.Password=Password;
+    }
+
+    public void Login(){
+        IsConnected=true;
+    }
+
+    public void LogOut(){
+        IsConnected=false;
+    }
+
     public boolean getIsConncted(){
         return IsConnected;
     }

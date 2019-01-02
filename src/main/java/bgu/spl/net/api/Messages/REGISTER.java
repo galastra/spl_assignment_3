@@ -1,13 +1,13 @@
 package bgu.spl.net.api.Messages;
 
 import bgu.spl.net.api.Client;
-import bgu.spl.net.api.Messages.ServerToClient.ServerMsg;
+import bgu.spl.net.api.Messages.ServerToClient.ACK;
+import bgu.spl.net.api.Messages.ServerToClient.ERROR;
 
-import java.util.List;
+import java.nio.ByteBuffer;
 
 public class REGISTER extends Message {
     public final short Opcode=1;
-    public final int ExpectedZeroBytes=2;
     private String UserName;
     private String PassWord;
 
@@ -16,7 +16,10 @@ public class REGISTER extends Message {
         this.UserName=UserName;
     }
 
-    public REGISTER(){}
+    public REGISTER(){
+        UserName="";
+        PassWord="";
+    }
 
     public String getPassWord() {
         return PassWord;
@@ -27,8 +30,18 @@ public class REGISTER extends Message {
     }
 
     @Override
-    public int getExpectedZeroBytes() {
-        return ExpectedZeroBytes;
+    public boolean decodeNextByte(byte nextByte) {
+        ByteBuffer buffer=ByteBuffer.allocate(1);
+        buffer.put(nextByte);
+        if(UserName.equals("") & buffer.getChar()=='\0')
+            UserName=GetStringFromBytes();
+        if(PassWord.equals("") & buffer.getChar()=='\0')
+        {
+            PassWord=GetStringFromBytes();
+            return true;
+        }
+        bytes.add(nextByte);
+        return false;
     }
 
     @Override
@@ -37,13 +50,14 @@ public class REGISTER extends Message {
     }
 
     @Override
-    public ServerMsg process(Client c) {
-        return super.process(c);
-        // TODO: 31-Dec-18  
+    public Message process(Client c) {
+        if(!c.getName().equals(""))
+            return new ERROR(Opcode);
+        else
+        {
+            c.Register(UserName,PassWord);
+            return new ACK(Opcode);
+        }
     }
 
-    @Override
-    public void decode(List<Byte> list) {
-        // TODO: 30-Dec-18  
-    }
 }

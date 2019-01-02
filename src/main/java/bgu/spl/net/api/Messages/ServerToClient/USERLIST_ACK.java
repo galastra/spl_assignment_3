@@ -1,16 +1,13 @@
 package bgu.spl.net.api.Messages.ServerToClient;
 
-import bgu.spl.net.api.Messages.FOLLOW;
-
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 
-public class FollowACK extends ACK {
+public class USERLIST_ACK extends ACK {
     private int NumOfUsers;
     private LinkedList<String> UserNameList;
-
-    public FollowACK(short Opcode, int NumOfUsers, LinkedList<String> UserNameList)
+    public USERLIST_ACK(short Opcode, int NumOfUsers, LinkedList<String> UserNameList)
     {
         super(Opcode);
         this.NumOfUsers=NumOfUsers;
@@ -19,37 +16,41 @@ public class FollowACK extends ACK {
 
     @Override
     public byte[] encode() {
-        //OpCode
-        byte[] A=encodeShort(Opcode);
+        byte[] A;
+        bytes=new LinkedList<>();
+        ByteBuffer buffer;
+        //Opcode
+        A=encodeShort(Opcode);
         for (byte temp:A) {
             bytes.add(temp);
         }
-        //MessageOpCode
+        //MsgOPcode
         A=encodeShort(MessageOpcode);
         for (byte temp:A) {
             bytes.add(temp);
         }
         //NumOfUsers
         Integer NUMOFUSERS=NumOfUsers;
-        short _NUMOFUSERS=NUMOFUSERS.shortValue();
-        A=encodeShort(_NUMOFUSERS);
+        short _NumOfUsers=NUMOFUSERS.shortValue();
+        A=encodeShort(_NumOfUsers);
         for (byte temp:A) {
             bytes.add(temp);
         }
         //UserNameList
         for (String Name:UserNameList) {
-            ByteBuffer buffer= StandardCharsets.UTF_8.encode(Name);
+            buffer= StandardCharsets.UTF_8.encode(Name);
             A=buffer.array();
             for (byte temp:A) {
                 bytes.add(temp);
             }
-            // \0 between each name
-            buffer=ByteBuffer.allocate(1);
+            // \0
+            buffer.reset();
             buffer.putChar('\0');
             A=buffer.array();
             for (byte temp:A) {
                 bytes.add(temp);
             }
+            buffer.reset();
         }
         return ListToArray();
     }

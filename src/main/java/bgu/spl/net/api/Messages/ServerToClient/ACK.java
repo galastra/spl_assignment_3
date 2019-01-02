@@ -1,8 +1,13 @@
 package bgu.spl.net.api.Messages.ServerToClient;
 
-import java.io.Serializable;
+import bgu.spl.net.api.Messages.Message;
 
-public class ACK extends ServerMsg {
+import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.LinkedList;
+
+public class ACK extends Message {
     public final short Opcode=10;
     protected short MessageOpcode;
 
@@ -13,6 +18,25 @@ public class ACK extends ServerMsg {
 
     public short getOpcode() {
         return Opcode;
+    }
+
+    @Override
+    public byte[] encode() {
+        //Opcode
+        bytes=new LinkedList<>();
+        ByteBuffer buffer=ByteBuffer.allocate(2);
+        buffer.putShort(Opcode);
+        for (byte temp:buffer.array()) {
+            bytes.add(temp);
+        }
+        buffer.reset();
+        //MessageOpcode
+        buffer=ByteBuffer.allocate(2);
+        buffer.putShort(MessageOpcode);
+        for (byte temp:buffer.array()) {
+            bytes.add(temp);
+        }
+        return ListToArray();
     }
 
     public short getMessageOpcode() {

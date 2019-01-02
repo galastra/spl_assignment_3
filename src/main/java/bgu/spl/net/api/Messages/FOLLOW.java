@@ -3,7 +3,6 @@ package bgu.spl.net.api.Messages;
 import bgu.spl.net.api.Client;
 import bgu.spl.net.api.Messages.ServerToClient.ERROR;
 import bgu.spl.net.api.Messages.ServerToClient.FollowACK;
-import bgu.spl.net.api.Messages.ServerToClient.ServerMsg;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -21,7 +20,6 @@ public class FOLLOW extends Message {
         Follow=false;
         NumOfUsers=0;
         UserNameList=new LinkedList<>();
-        IsReady=false;
         bytes=new LinkedList<>();
     }
 
@@ -88,7 +86,7 @@ public class FOLLOW extends Message {
             bb.put(bytes.remove(0));
             bb.put(bytes.remove(0));
             NumOfUsers=bb.getShort();
-            NumOfUsers++;
+            NumOfUsers++;//so we wont reach to NumofUsers==0 and bytes.size==2 and do again this operation
         }
 
         if(NumOfUsers==0)//insufficient info to determine NumOfUsers
@@ -103,7 +101,7 @@ public class FOLLOW extends Message {
             ByteBuffer bb=ByteBuffer.allocate(1);
             bb.order(ByteOrder.LITTLE_ENDIAN);
             bb.put(nextByte);
-            if(bb.getChar()=='0')
+            if(bb.getChar()=='\0')
             {
                 NumOfUsers--;
                 UserNameList.add(GetStringFromBytes());
@@ -131,7 +129,7 @@ public class FOLLOW extends Message {
     }
 */
     @Override
-    public ServerMsg process(Client c) {
+    public Message process(Client c) {
         if(NumOfUsers==0)
             return new ERROR(Opcode);
         else
