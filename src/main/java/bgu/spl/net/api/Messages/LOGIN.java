@@ -40,7 +40,7 @@ public LOGIN(){}
     @Override
     public ServerMsg process(Client c) {
         //if name is "" then the person is now registered or Maybe he is already connected
-        if(c.getName()=="" | c.getIsConncted() )
+        if(c.getName().equals("") | c.getIsConncted() )
             return new ERROR(Opcode);
         else
             return new ACK<Object>()

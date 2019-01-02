@@ -16,6 +16,7 @@ public class MsgEncodeDecode implements MessageEncoderDecoder<Message> {
 
     @Override
     public Message decodeNextByte(byte nextByte) {
+
         if(arr.size()<2)
             arr.add(nextByte);
         else if(OpCode==0)
@@ -27,7 +28,7 @@ public class MsgEncodeDecode implements MessageEncoderDecoder<Message> {
             OpCode=bb.getShort();
 
         }
-        else if(ExpectedBytes>0)
+        else if(ExpectedBytes>0)// TODO: 1/1/19 note that expected is not yet initialized  
         {
             arr.add(nextByte);
             ExpectedBytes--;

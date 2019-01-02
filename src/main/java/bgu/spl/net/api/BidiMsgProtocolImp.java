@@ -26,6 +26,7 @@ public class BidiMsgProtocolImp implements BidiMessagingProtocol<Message> {
 
     @Override
     public void start(int connectionId, Connections<Message> connections) {
+
         //should i save connections?
         //should i register client
     }
