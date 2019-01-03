@@ -8,13 +8,13 @@ import java.util.List;
 public class USERLIST extends Message {
     public final short Opcode=7;
 
-    @Override
+    //@Override
     public void decode(List<Byte> list) {
         // TODO: 30-Dec-18
     }
 
     @Override
-    public int getOpCode() {
+    public short getOpCode() {
         return Opcode;
     }
 

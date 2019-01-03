@@ -5,6 +5,8 @@ import bgu.spl.net.api.Messages.ServerToClient.ACK;
 import bgu.spl.net.api.Messages.ServerToClient.ERROR;
 import bgu.spl.net.api.Messages.ServerToClient.ServerMsg;
 
+import java.nio.ByteBuffer;
+import java.util.LinkedList;
 import java.util.List;
 
 public class LOGIN extends Message{
@@ -15,6 +17,8 @@ private String PassWord;
 public LOGIN(String UserName,String PassWord){
     this.PassWord=PassWord;
     this.UserName=UserName;
+    IsReady=false;
+    bytes=new LinkedList<>();
 }
 
 public LOGIN(){}
@@ -28,21 +32,36 @@ public LOGIN(){}
     }
 
     @Override
-    public int getOpCode() {
+    public short getOpCode() {
         return Opcode;
     }
 
     @Override
-    public void decode(List<Byte> list) {
-        // TODO: 30-Dec-18  
+    public boolean decodeNextByte(byte nextByte) {
+        ByteBuffer buffer=ByteBuffer.allocate(1);
+        buffer.put(nextByte);
+        if(UserName.equals("") & buffer.getChar()=='0')
+        {
+            UserName=GetStringFromBytes();
+        }
+        if(PassWord.equals("") & buffer.getChar()=='0')
+        {
+            PassWord=GetStringFromBytes();
+            return true;
+        }
+        bytes.add(nextByte);
+        return false;
+
     }
+
+
 
     @Override
     public ServerMsg process(Client c) {
-        //if name is "" then the person is now registered or Maybe he is already connected
-        if(c.getName().equals("") | c.getIsConncted() )
+        //if name is "" then the person is not registered or Maybe he is already connected
+        if(c.getName()=="" | c.getIsConncted() )
             return new ERROR(Opcode);
         else
-            return new ACK<Object>()
+            return new ACK(Opcode);
     }
 }

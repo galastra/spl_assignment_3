@@ -11,13 +11,13 @@ public class STAT extends Message {
 
     public STAT(){}
 
-    @Override
+    //@Override
     public void decode(List<Byte> list) {
         // TODO: 30-Dec-18  
     }
 
     @Override
-    public int getOpCode() {
+    public short getOpCode() {
         return Opcode;
     }
 

@@ -13,17 +13,13 @@ public class POST extends Message {
 
     public POST(){}
 
-    @Override
-    public void decode(List<Byte> list) {
-        // TODO: 30-Dec-18  
-    }
 
     public String getContent() {
         return Content;
     }
 
     @Override
-    public int getOpCode() {
+    public short getOpCode() {
         return Opcode;
     }
 
