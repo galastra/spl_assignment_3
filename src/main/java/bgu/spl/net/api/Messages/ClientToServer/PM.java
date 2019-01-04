@@ -8,6 +8,7 @@ import bgu.spl.net.api.Messages.ServerToClient.NOTIFICATION;
 import bgu.spl.net.api.bidi.Connections;
 
 import java.nio.ByteBuffer;
+import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -16,7 +17,11 @@ public class PM extends Message {
     private String UserName;
     private String Content;
     
-    public PM(){}
+    public PM(){
+        UserName="";
+        Content="";
+        bytes=new LinkedList<>();
+    }
 
     @Override
     public short getOpCode() {
@@ -33,18 +38,22 @@ public class PM extends Message {
 
     @Override
     public boolean decodeNextByte(byte nextByte) {
-        ByteBuffer buffer=ByteBuffer.allocate(1);
-        buffer.put(nextByte);
-        if(UserName.equals("") & buffer.getChar()=='\0') {
+        Byte temp=nextByte;
+        if(UserName.equals("") & temp.shortValue()==0) {
             UserName = GetStringFromBytes();
             return false;
         }
-        if(Content.equals("") & buffer.getChar()=='\0'){
+        if(Content.equals("") & temp.shortValue()==0){
             Content=GetStringFromBytes();
             return true;
         }
         bytes.add(nextByte);
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "PM "+UserName+" "+Content;
     }
 
     @Override

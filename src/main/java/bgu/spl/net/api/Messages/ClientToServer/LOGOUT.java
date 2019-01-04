@@ -20,6 +20,11 @@ public class LOGOUT extends Message {
     }
 
     @Override
+    public String toString() {
+        return "LOGOUT";
+    }
+
+    @Override
     public short getOpCode() {
         return Opcode;
     }

@@ -7,6 +7,7 @@ import bgu.spl.net.api.Messages.ServerToClient.STATACK;
 import bgu.spl.net.api.bidi.Connections;
 
 import java.nio.ByteBuffer;
+import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -16,19 +17,24 @@ public class STAT extends Message {
 
     public STAT(){
         UserName="";
+        bytes=new LinkedList<>();
     }
 
     @Override
     public boolean decodeNextByte(byte nextByte) {
-        ByteBuffer buffer=ByteBuffer.allocate(1);
-        buffer.put(nextByte);
-        if(UserName.equals("") & buffer.getChar()=='\0')
+        Byte temp=nextByte;
+        if(UserName.equals("") & temp.shortValue()==0)
         {
             UserName=GetStringFromBytes();
             return true;
         }
         bytes.add(nextByte);
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "STAT "+UserName;
     }
 
     @Override

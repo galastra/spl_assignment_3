@@ -16,13 +16,11 @@ public final short Opcode=2;
 private String UserName;
 private String PassWord;
 
-public LOGIN(String UserName,String PassWord){
-    this.PassWord=PassWord;
-    this.UserName=UserName;
+public LOGIN(){
+    UserName="";
+    PassWord="";
     bytes=new LinkedList<>();
 }
-
-public LOGIN(){}
 
     public String getUserName() {
         return UserName;
@@ -39,14 +37,13 @@ public LOGIN(){}
 
     @Override
     public boolean decodeNextByte(byte nextByte) {
-        ByteBuffer buffer=ByteBuffer.allocate(1);
-        buffer.put(nextByte);
-        if(UserName.equals("") & buffer.getChar()=='\0')
+        Byte temp=nextByte;
+        if(UserName.equals("") & temp.shortValue()==0)
         {
             UserName=GetStringFromBytes();
             return false;
         }
-        if(PassWord.equals("") & buffer.getChar()=='\0')
+        if(PassWord.equals("") & temp.shortValue()==0)
         {
             PassWord=GetStringFromBytes();
             return true;
@@ -56,7 +53,10 @@ public LOGIN(){}
 
     }
 
-
+    @Override
+    public String toString() {
+        return "LOGIN "+UserName+" "+ PassWord;
+    }
 
     @Override
     public Message process(Client c, Connections<Message> connection, ConcurrentHashMap<String,Client> clients, ConcurrentLinkedQueue<Message> AllMessages) {

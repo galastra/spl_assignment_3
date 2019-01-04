@@ -8,6 +8,8 @@ import bgu.spl.net.api.bidi.Connections;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,21 +46,20 @@ public class FOLLOW extends Message {
     public boolean decodeNextByte(byte nextByte) {
         if(FirstByte)//wil happen first
         {
-            ByteBuffer bb=ByteBuffer.allocate(1);
-            bb.order(ByteOrder.LITTLE_ENDIAN);
-            bb.put(nextByte);
-            char a=bb.getChar();
-            if(a=='0')
+            Byte temp=nextByte;
+            if(temp.shortValue()==0)
                 Follow=true;
             FirstByte=false;
+            return false;
         }
 
         if(NumOfUsers==0 & bytes.size()==2)//check if i have the info to determine NumOfUsers
         {
             ByteBuffer bb=ByteBuffer.allocate(2);
-            bb.order(ByteOrder.LITTLE_ENDIAN);
+            bb.order(ByteOrder.BIG_ENDIAN);
             bb.put(bytes.remove(0));
             bb.put(bytes.remove(0));
+            bb.flip();
             NumOfUsers=bb.getShort();
             NumOfUsers++;//so we wont reach to NumofUsers==0 and bytes.size==2 and do again this operation
         }
@@ -67,18 +68,23 @@ public class FOLLOW extends Message {
             bytes.add(nextByte);
         else//here we infer the User List
         {
-            if(NumOfUsers==1) {
-                Integer A=UserNameList.size();
-                NumOfUsers=A.shortValue();
-                return true;
-            }
+
+            /*
             ByteBuffer bb=ByteBuffer.allocate(1);
-            bb.order(ByteOrder.LITTLE_ENDIAN);
+            bb.order(ByteOrder.BIG_ENDIAN);
             bb.put(nextByte);
-            if(bb.getChar()=='\0')
+            bb.flip();
+            */
+            Byte temp=nextByte;
+            if(temp.shortValue()==0)
             {
                 NumOfUsers--;
                 UserNameList.add(GetStringFromBytes());
+                if(NumOfUsers==1) {
+                    Integer A=UserNameList.size();
+                    NumOfUsers=A.shortValue();
+                    return true;
+                }
             }
             else
                 bytes.add(nextByte);
@@ -119,5 +125,26 @@ public class FOLLOW extends Message {
                     return new FollowACK(Opcode,succesfullUnFollow.size(),succesfullUnFollow);
             }
         }
+    }
+
+    @Override
+    public byte[] encode() {
+        char ifFollow;
+        if (Follow)
+            ifFollow = '0';
+        else
+            ifFollow = '1';
+        String str = getOpCode() + ifFollow + " " + NumOfUsers + " " + Arrays.toString(UserNameList.toArray());
+        return str.getBytes(StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public String toString() {
+        char ifFollow;
+        if (Follow)
+            ifFollow = '0';
+        else
+            ifFollow = '1';
+        return "FOLLOW "+ifFollow+" "+NumOfUsers+" "+UserNameList.toString();
     }
 }

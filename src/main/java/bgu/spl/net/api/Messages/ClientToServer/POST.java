@@ -21,6 +21,7 @@ public class POST extends Message {
     public POST(){
         Content="";
         UsersToNotify=new LinkedList<>();
+        bytes=new LinkedList<>();
     }
 
 
@@ -35,9 +36,8 @@ public class POST extends Message {
 
     @Override
     public boolean decodeNextByte(byte nextByte) {
-        ByteBuffer buffer=ByteBuffer.allocate(1);
-        buffer.put(nextByte);
-        if(Content.equals("") & buffer.getChar()=='\0')
+        Byte temp=nextByte;
+        if(Content.equals("") & temp.shortValue()==0)
         {
             Content=GetStringFromBytes();
             setUsersToNotify();
@@ -82,5 +82,10 @@ public class POST extends Message {
 
     public List<String> getUsersToNotify() {
         return UsersToNotify;
+    }
+
+    @Override
+    public String toString() {
+        return "POST "+Content;
     }
 }
