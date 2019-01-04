@@ -1,33 +1,47 @@
 package bgu.spl.net.api;
 
+import bgu.spl.net.api.Messages.Message;
+
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Client {
     private String Name;
     private String Password;
     private int NumPosts;
-    private LinkedList<String> Followers;//maybe a list
-    private int NumFollowing;//maybe a list
+    private ConcurrentLinkedQueue<String> Followers;//maybe a list
+    private ConcurrentLinkedQueue<String> Following;//maybe a list
     private boolean IsConnected;
+    private int connId;
+    private ConcurrentLinkedQueue<Message> appending_msgs;
 
     public Client(){
+        connId = 0;
         Name="";
         Password="";
-        Followers=new LinkedList<>();
-        NumFollowing=0;
+        Followers=new ConcurrentLinkedQueue<>();
+        Following=new ConcurrentLinkedQueue<>();
         NumPosts=0;
         IsConnected=false;
+        appending_msgs = new ConcurrentLinkedQueue<>();
     }
 
     public int getNumPosts() {
         return NumPosts;
     }
 
-    public int getNumFollowing() {
-        return NumFollowing;
+    public ConcurrentLinkedQueue<String> getFollowing() {
+        return Following;
     }
 
-    public LinkedList<String> getFollowers() {
+    public boolean AddFollowing(String Name){
+        if(Following.contains(Name))
+            return false;
+        Following.add(Name);
+        return true;
+    }
+
+    public ConcurrentLinkedQueue<String> getFollowers() {
         return Followers;
     }
 
@@ -48,6 +62,20 @@ public class Client {
         return false;
     }
 
+    public void Register(String Name,String Password)
+    {
+        this.Name=Name;
+        this.Password=Password;
+    }
+
+    public void Login(){
+        IsConnected=true;
+    }
+
+    public void LogOut(){
+        IsConnected=false;
+    }
+
     public boolean getIsConncted(){
         return IsConnected;
     }
@@ -58,5 +86,21 @@ public class Client {
 
     public String getPassword() {
         return Password;
+    }
+
+    public int getConnId() {
+        return connId;
+    }
+
+    public void setConnId(int connId) {
+        this.connId = connId;
+        Name = ((Integer)connId).toString();
+    }
+
+    public void addMsg(Message msg){
+        appending_msgs.add(msg);
+    }
+    public ConcurrentLinkedQueue<Message> getAppending_msgs(){
+        return appending_msgs;
     }
 }

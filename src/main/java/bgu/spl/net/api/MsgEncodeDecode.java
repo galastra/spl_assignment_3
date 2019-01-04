@@ -1,6 +1,7 @@
 package bgu.spl.net.api;
 
-import bgu.spl.net.api.Messages.*;
+import bgu.spl.net.api.Messages.ClientToServer.*;
+import bgu.spl.net.api.Messages.Message;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -11,7 +12,7 @@ public class MsgEncodeDecode implements MessageEncoderDecoder<Message> {
     private short OpCode;
     private Message CurrentMsg;
     public MsgEncodeDecode(){
-
+        CurrentMsg=new Message();
     }
 
     @Override
@@ -25,21 +26,27 @@ public class MsgEncodeDecode implements MessageEncoderDecoder<Message> {
                 bb.put(arr.remove(0));
                 bb.put(arr.remove(0));
                 OpCode=bb.getShort();
+
+                getMassage(OpCode);
             }
             else
                 arr.add(nextByte);
         }
-        else{
-           if(CurrentMsg.decodeNextByte(nextByte))
-               return CurrentMsg;
-        }
+           if(CurrentMsg.decodeNextByte(nextByte))//should also deal with msg like USERLIST with only Opcode being sent
+           {
+               Message to_return = CurrentMsg;
+               CurrentMsg = new Message();
+               OpCode = 0;
+               return to_return;
+           }
+
         return null;
     }
 
     @Override
     public byte[] encode(Message message) {
-        //return message.encode();
-        return null;
+        // 02-Jan-19 those msg will be only a server to client msg
+        return message.encode();
     }
 
     private void getMassage(short OpCode)

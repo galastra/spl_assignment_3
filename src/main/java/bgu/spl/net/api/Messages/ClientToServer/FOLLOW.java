@@ -1,14 +1,17 @@
-package bgu.spl.net.api.Messages;
+package bgu.spl.net.api.Messages.ClientToServer;
 
 import bgu.spl.net.api.Client;
+import bgu.spl.net.api.Messages.Message;
 import bgu.spl.net.api.Messages.ServerToClient.ERROR;
 import bgu.spl.net.api.Messages.ServerToClient.FollowACK;
-import bgu.spl.net.api.Messages.ServerToClient.ServerMsg;
+import bgu.spl.net.api.bidi.Connections;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class FOLLOW extends Message {
     public final short Opcode=4;
@@ -21,7 +24,6 @@ public class FOLLOW extends Message {
         Follow=false;
         NumOfUsers=0;
         UserNameList=new LinkedList<>();
-        IsReady=false;
         bytes=new LinkedList<>();
     }
 
@@ -37,36 +39,6 @@ public class FOLLOW extends Message {
     public List<String> getUserNameList() {
         return UserNameList;
     }
-/*
-    @Override
-    public byte[] encode() {// no need to encode a client to server msg
-        ByteBuffer buffer;
-        LinkedList<Byte> arr=new LinkedList<>();
-        //OpCode
-        byte[] b=encodeShort(Opcode);
-        for (byte temp:b) {
-            arr.add(temp);
-        }
-        //Follow
-        buffer=ByteBuffer.allocate(1);
-        buffer.order(ByteOrder.LITTLE_ENDIAN);
-        if(Follow)
-            buffer.putChar('0');
-        else
-            buffer.putChar('1');
-        for (byte temp:buffer.array()) {//should be one byte but.... who knows
-            arr.add(temp);
-        }
-        //NumOfUsers
-        buffer=ByteBuffer.allocate(2);
-        buffer.putShort(NumOfUsers);
-        for (byte temp:buffer.array()) {
-            arr.add(temp);
-        }
-        //UsersNameList
-        return
-    }
-*/
 
     @Override
     public boolean decodeNextByte(byte nextByte) {
@@ -88,7 +60,7 @@ public class FOLLOW extends Message {
             bb.put(bytes.remove(0));
             bb.put(bytes.remove(0));
             NumOfUsers=bb.getShort();
-            NumOfUsers++;
+            NumOfUsers++;//so we wont reach to NumofUsers==0 and bytes.size==2 and do again this operation
         }
 
         if(NumOfUsers==0)//insufficient info to determine NumOfUsers
@@ -103,7 +75,7 @@ public class FOLLOW extends Message {
             ByteBuffer bb=ByteBuffer.allocate(1);
             bb.order(ByteOrder.LITTLE_ENDIAN);
             bb.put(nextByte);
-            if(bb.getChar()=='0')
+            if(bb.getChar()=='\0')
             {
                 NumOfUsers--;
                 UserNameList.add(GetStringFromBytes());
@@ -113,25 +85,9 @@ public class FOLLOW extends Message {
         }
         return false;
     }
-/*
-    private String GetName(){//hope this works
-        ByteBuffer bb=ByteBuffer.allocate(1);
-        bb.order(ByteOrder.LITTLE_ENDIAN);
-        for (Byte temp: bytes) {
-            bb.put(temp);
-        }
-        try {
-            return new String(bb.array(),"US-ASCII");
-        }
-        catch (Exception e)
-        {
-            System.out.println("problem with Get Name in Follow class");
-        }
-        return "";
-    }
-*/
+
     @Override
-    public ServerMsg process(Client c) {
+    public Message process(Client c, Connections<Message> connection, ConcurrentHashMap<String,Client> clients, ConcurrentLinkedQueue<Message> AllMessages) {
         if(NumOfUsers==0)
             return new ERROR(Opcode);
         else
@@ -141,7 +97,7 @@ public class FOLLOW extends Message {
                 LinkedList<String> succesfullFollow=new LinkedList<>();
 
                 for (String Name:UserNameList) {
-                    if(c.AddFollower(Name))
+                    if(clients.containsKey(Name) && c.AddFollower(Name))
                         succesfullFollow.add(Name);
                 }
                 if(succesfullFollow.size()==0)
@@ -154,7 +110,7 @@ public class FOLLOW extends Message {
                 LinkedList<String> succesfullUnFollow=new LinkedList<>();
 
                 for (String Name:UserNameList) {
-                    if(c.RemoveFollower(Name))
+                    if(clients.containsKey(Name) && c.RemoveFollower(Name))
                         succesfullUnFollow.add(Name);
                 }
                 if(succesfullUnFollow.size()==0)

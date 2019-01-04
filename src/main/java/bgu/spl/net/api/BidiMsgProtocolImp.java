@@ -1,16 +1,19 @@
 package bgu.spl.net.api;
 
 import bgu.spl.net.api.Messages.Message;
-import bgu.spl.net.api.Messages.ServerToClient.ServerMsg;
 import bgu.spl.net.api.bidi.BidiMessagingProtocol;
 import bgu.spl.net.api.bidi.Connections;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 public class BidiMsgProtocolImp implements BidiMessagingProtocol<Message> {
-
-    private boolean shouldTerminate=false;
+    private static ConcurrentHashMap<String,Client> clients;
+    private static ConcurrentLinkedQueue<Message> AllMessage;
+    private Connections<Message> connectionsImp;
+    private boolean shouldTerminate;
     private Client client;
-
-    public BidiMsgProtocolImp(){}
+    private int connectionId;
 
     @Override
     public boolean shouldTerminate() {
@@ -19,15 +22,24 @@ public class BidiMsgProtocolImp implements BidiMessagingProtocol<Message> {
 
     @Override
     public void process(Message message) {
-        ServerMsg serverMsg=message.process(client);
-        //how and to whom may i return the answer?
-        // TODO: 31-Dec-18
+        Message msg=message.process(client,connectionsImp,clients,AllMessage);
+        connectionsImp.send(client.getConnId(),msg);
+        //check for messages while the client was AFK
+        if (!client.getAppending_msgs().isEmpty()) //might be true allegedly only after LOGIN
+            for (Message appending_msg : client.getAppending_msgs())
+                connectionsImp.send(client.getConnId(),appending_msg);
+    }
+
+    public boolean exist(String Name){
+        return clients.containsKey(Name);
     }
 
     @Override
     public void start(int connectionId, Connections<Message> connections) {
-
-        //should i save connections?
-        //should i register client
+        this.connectionId=connectionId;
+        connectionsImp = connections;
+        this.client = new Client();
+        this.client.setConnId(connectionId);
+        shouldTerminate = false;
     }
 }

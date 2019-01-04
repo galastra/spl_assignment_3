@@ -1,15 +1,17 @@
-package bgu.spl.net.api.Messages;
+package bgu.spl.net.api.Messages.ClientToServer;
 
 import bgu.spl.net.api.Client;
+import bgu.spl.net.api.Messages.Message;
 import bgu.spl.net.api.Messages.ServerToClient.ACK;
 import bgu.spl.net.api.Messages.ServerToClient.ERROR;
-import bgu.spl.net.api.Messages.ServerToClient.ServerMsg;
+import bgu.spl.net.api.bidi.Connections;
 
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class LOGIN extends Message{
+public class LOGIN extends Message {
 public final short Opcode=2;
 private String UserName;
 private String PassWord;
@@ -17,7 +19,6 @@ private String PassWord;
 public LOGIN(String UserName,String PassWord){
     this.PassWord=PassWord;
     this.UserName=UserName;
-    IsReady=false;
     bytes=new LinkedList<>();
 }
 
@@ -40,11 +41,12 @@ public LOGIN(){}
     public boolean decodeNextByte(byte nextByte) {
         ByteBuffer buffer=ByteBuffer.allocate(1);
         buffer.put(nextByte);
-        if(UserName.equals("") & buffer.getChar()=='0')
+        if(UserName.equals("") & buffer.getChar()=='\0')
         {
             UserName=GetStringFromBytes();
+            return false;
         }
-        if(PassWord.equals("") & buffer.getChar()=='0')
+        if(PassWord.equals("") & buffer.getChar()=='\0')
         {
             PassWord=GetStringFromBytes();
             return true;
@@ -57,11 +59,13 @@ public LOGIN(){}
 
 
     @Override
-    public ServerMsg process(Client c) {
+    public Message process(Client c, Connections<Message> connection, ConcurrentHashMap<String,Client> clients, ConcurrentLinkedQueue<Message> AllMessages) {
         //if name is "" then the person is not registered or Maybe he is already connected
-        if(c.getName()=="" | c.getIsConncted() )
-            return new ERROR(Opcode);
-        else
+        if (clients.containsKey(UserName) && clients.get(UserName).getPassword().equals(PassWord) && !clients.get(UserName).getIsConncted()) {
+            c = clients.get(UserName);
+            c.Login();
             return new ACK(Opcode);
+        }
+        return new ERROR(Opcode);
     }
 }
