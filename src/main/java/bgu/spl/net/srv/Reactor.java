@@ -103,14 +103,12 @@ public class Reactor<T> implements Server<T> {
         SocketChannel clientChan = serverChan.accept();
         clientChan.configureBlocking(false);
         BidiMessagingProtocol tmp_protocol = protocolFactory.get();
-        tmp_protocol.start(connId,connections);
-
         final NonBlockingConnectionHandler<T> handler = new NonBlockingConnectionHandler<>(
                 readerFactory.get(),
                 tmp_protocol,
                 clientChan,
                 this);
-        connections.register(connId++,handler);
+        tmp_protocol.start(connections.register(handler),connections);
         clientChan.register(selector, SelectionKey.OP_READ, handler);
     }
 

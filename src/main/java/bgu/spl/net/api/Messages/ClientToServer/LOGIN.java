@@ -1,6 +1,7 @@
 package bgu.spl.net.api.Messages.ClientToServer;
 
 import bgu.spl.net.api.Client;
+import bgu.spl.net.api.ConnectionsImp;
 import bgu.spl.net.api.Messages.Message;
 import bgu.spl.net.api.Messages.ServerToClient.ACK;
 import bgu.spl.net.api.Messages.ServerToClient.ERROR;
@@ -62,7 +63,11 @@ public LOGIN(){
     public Message process(Client c, Connections<Message> connection, ConcurrentHashMap<String,Client> clients, ConcurrentLinkedQueue<Message> AllMessages) {
         //if name is "" then the person is not registered or Maybe he is already connected
         if (clients.containsKey(UserName) && clients.get(UserName).getPassword().equals(PassWord) && !clients.get(UserName).getIsConncted()) {
-            c = clients.get(UserName);
+            int connId=c.getConnId();
+            c.setClient(clients.get(UserName));
+            clients.get(UserName).Login();
+            clients.get(UserName).setConnId(connId);
+            c.setConnId(connId);
             c.Login();
             return new ACK(Opcode);
         }

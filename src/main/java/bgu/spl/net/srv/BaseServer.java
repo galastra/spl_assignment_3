@@ -17,7 +17,6 @@ public abstract class BaseServer<T> implements Server<T> {
     private final Supplier<MessageEncoderDecoder<T>> encdecFactory;
     private ServerSocket sock;
     private ConnectionsImp<T> connections;
-    private int connId;
 
     public BaseServer(
             int port,
@@ -29,7 +28,6 @@ public abstract class BaseServer<T> implements Server<T> {
         this.encdecFactory = encdecFactory;
 		this.sock = null;
 		connections = new ConnectionsImp<>();
-		connId = 0;
     }
 
     @Override
@@ -45,14 +43,12 @@ public abstract class BaseServer<T> implements Server<T> {
                 Socket clientSock = serverSock.accept();
                 System.out.println("accepted connection!");
                 BidiMessagingProtocol temp_protocol=protocolFactory.get();
-                temp_protocol.start(connId,connections);
+
                 BlockingConnectionHandler<T> handler = new BlockingConnectionHandler<>(
                         clientSock,
                         encdecFactory.get(),
                         temp_protocol);
-
-                connections.register(connId,handler);
-                connId++;
+                temp_protocol.start(connections.register(handler),connections);
                 execute(handler);
             }
         } catch (IOException ex) {

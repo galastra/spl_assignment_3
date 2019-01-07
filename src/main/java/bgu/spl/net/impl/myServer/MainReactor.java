@@ -1,4 +1,4 @@
-package bgu.spl.net.myServer;
+package bgu.spl.net.impl.myServer;
 
 import java.io.IOException;
 

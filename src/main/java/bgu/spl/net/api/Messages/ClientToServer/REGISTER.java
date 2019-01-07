@@ -63,12 +63,13 @@ public class REGISTER extends Message {
 
     @Override
     public Message process(Client c, Connections<Message> connection, ConcurrentHashMap<String,Client> clients, ConcurrentLinkedQueue<Message> AllMessages) {
-        if(!c.getName().equals(""))
+        if(UserName.isEmpty() || clients.containsKey(UserName))
             return new ERROR(Opcode);
         else
         {
-            c.Register(UserName,PassWord);
-            clients.put(c.getName(),c);
+            Client temp=new Client();
+            temp.Register(UserName,PassWord);
+            clients.put(UserName,temp);
             return new ACK(Opcode);
         }
     }

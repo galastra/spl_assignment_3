@@ -28,42 +28,43 @@ public class NOTIFICATION extends Message {
         //IsPM
         buffer=ByteBuffer.allocate(1);
         if(IsPM)
-            buffer.putChar('0');
+            bytes.add((byte)'\0');
         else
-            buffer.putChar('1');
-        A=buffer.array();
-        for (byte temp:A) {
-            bytes.add(temp);
-        }
+            bytes.add((byte)1);
+
         //Posting User
         buffer= StandardCharsets.UTF_8.encode(PostingUser);
         A=buffer.array();
         for (byte temp:A) {
             bytes.add(temp);
         }
-        buffer.reset();
+
         // \0
+        bytes.add((byte)'\0');
+        /*
         buffer=ByteBuffer.allocate(1);
         buffer.putChar('\0');
         A=buffer.array();
         for (byte temp:A) {
             bytes.add(temp);
         }
-        buffer.reset();
+        */
         //Content
         buffer=StandardCharsets.UTF_8.encode(Content);
         A=buffer.array();
         for (byte temp:A) {
             bytes.add(temp);
         }
-        buffer.reset();
         // \0
+        /*
         buffer=ByteBuffer.allocate(1);
         buffer.putChar('\0');
         A=buffer.array();
         for (byte temp:A) {
             bytes.add(temp);
         }
+        */
+        bytes.add((byte)'\0');
         return ListToArray();
     }
 
@@ -71,6 +72,7 @@ public class NOTIFICATION extends Message {
         PostingUser=Name;
         this.IsPM=IsPM;
         this.Content=Content;
+        bytes=new LinkedList<>();
     }
 
 }

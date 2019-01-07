@@ -2,7 +2,6 @@ package bgu.spl.net.srv;
 
 import bgu.spl.net.api.MessageEncoderDecoder;
 import bgu.spl.net.api.bidi.BidiMessagingProtocol;
-import bgu.spl.net.srv.bidi.ConnectionHandler;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -62,7 +61,7 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
                 System.out.println("ERROR: tried to send a null message");
         }
         catch (Exception e){
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: while trying to send. reason: "+e.getMessage());
         }
     }
 }

@@ -27,7 +27,7 @@ public class ACK extends Message {
         for (byte temp:buffer.array()) {
             bytes.add(temp);
         }
-        buffer.reset();
+        //buffer.reset();
         //MessageOpcode
         buffer=ByteBuffer.allocate(2);
         buffer.putShort(MessageOpcode);

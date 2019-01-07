@@ -1,6 +1,6 @@
-package bgu.spl.net.myServer;
+package bgu.spl.net.impl.myServer;
 
-import bgu.spl.net.api.BidiMsgProtocolImp;
+import bgu.spl.net.api.bidi.BidiMsgProtocolImp;
 import bgu.spl.net.api.MsgEncodeDecode;
 import bgu.spl.net.srv.Server;
 

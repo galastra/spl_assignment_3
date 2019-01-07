@@ -13,6 +13,7 @@ public class FollowACK extends ACK {
         super(Opcode);
         this.NumOfUsers=NumOfUsers;
         this.UserNameList=UserNameList;
+        bytes = new LinkedList<>();
     }
 
     @Override
@@ -42,12 +43,15 @@ public class FollowACK extends ACK {
                 bytes.add(temp);
             }
             // \0 between each name
+            /*
             buffer=ByteBuffer.allocate(1);
             buffer.putChar('\0');
             A=buffer.array();
             for (byte temp:A) {
                 bytes.add(temp);
             }
+            */
+            bytes.add((byte)'\0');
         }
         return ListToArray();
     }

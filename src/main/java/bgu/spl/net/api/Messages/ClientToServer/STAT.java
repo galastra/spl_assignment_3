@@ -50,5 +50,4 @@ public class STAT extends Message {
         // should get access to the given user name to infer STATACK needed values, access granted
         //return new STATACK(Opcode), returned
     }
-
 }

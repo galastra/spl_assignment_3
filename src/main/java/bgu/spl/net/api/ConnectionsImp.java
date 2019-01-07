@@ -1,15 +1,18 @@
 package bgu.spl.net.api;
 import bgu.spl.net.api.bidi.Connections;
-import bgu.spl.net.srv.bidi.ConnectionHandler;
+import bgu.spl.net.srv.ConnectionHandler;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class ConnectionsImp<T> implements Connections<T> {
     private ConcurrentHashMap<Integer,ConnectionHandler<T>> connectionHandlers;
+    private AtomicInteger connId;
 
     public ConnectionsImp(){
         connectionHandlers = new ConcurrentHashMap<>();
+        connId = new AtomicInteger(0);
     }
 
     public ConnectionsImp(ConcurrentHashMap<Integer,ConnectionHandler<T>> _connectionHandlers){
@@ -36,15 +39,16 @@ public class ConnectionsImp<T> implements Connections<T> {
     public void disconnect(int connId) {
         try {
             connectionHandlers.get(connId).close();
+            connectionHandlers.remove(connId);
         }
         catch (Exception e){
             System.out.println("ERROR: "+e.getMessage());
         }
-        connectionHandlers.remove(connId);
     }
 
-    public void register(int connId, ConnectionHandler<T> connectionHandler){
-        connectionHandlers.put(connId,connectionHandler);
+    public int register(ConnectionHandler<T> connectionHandler){
+        connectionHandlers.put(connId.get(),connectionHandler);
+        return connId.getAndIncrement();
     }
 
     //should we enter a register function?

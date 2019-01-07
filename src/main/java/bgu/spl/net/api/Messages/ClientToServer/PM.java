@@ -60,17 +60,21 @@ public class PM extends Message {
     public Message process(Client c, Connections<Message> connection, ConcurrentHashMap<String,Client> clients, ConcurrentLinkedQueue<Message> AllMessages) {
         if(!c.getIsConncted() | Content.contains("@"))
             return new ERROR(Opcode);
-            if (!clients.containsKey(UserName))
-                return new ERROR(Opcode);
-            else {
-                AllMessages.add(this);
-                if (clients.get(UserName).getIsConncted())
-                    connection.send(clients.get(UserName).getConnId(), new NOTIFICATION(true, c.getName(), Content));
-                else
-                    clients.get(UserName).addMsg(new NOTIFICATION(true,c.getName(),Content));
+        if (!clients.containsKey(UserName))
+            return new ERROR(Opcode);
+        else {
+            AllMessages.add(this);
+            if (clients.get(UserName).getIsConncted()) {
+                int connId = clients.get(UserName).getConnId();
+                connection.send(clients.get(UserName).getConnId(), new NOTIFICATION(true, c.getName(), Content));
             }
+            else
+                clients.get(UserName).addMsg(new NOTIFICATION(true,c.getName(),Content));
+        }
             //if the recipient isn't registered than an error msg should be sent ,how to check it? done
             //all pm msg should be stored in the server with the post msg
+        c.AddToNumPost();
+        clients.get(c.getName()).AddToNumPost();
         return new ACK(Opcode);
 
     }

@@ -32,7 +32,8 @@ public class LOGOUT extends Message {
     @Override
     public Message process(Client c, Connections<Message> connection, ConcurrentHashMap<String,Client> clients, ConcurrentLinkedQueue<Message> AllMessages) {
         if(c.getIsConncted()) {
-            connection.disconnect(c.getConnId());
+            c.LogOut();
+            clients.get(c.getName()).LogOut();
             return new ACK(Opcode);
         }
         return new ERROR(Opcode);

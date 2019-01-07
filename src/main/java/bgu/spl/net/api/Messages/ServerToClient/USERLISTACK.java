@@ -45,6 +45,7 @@ public class USERLISTACK extends ACK {
                 bytes.add(temp);
             }
             // \0
+            /*
             buffer.reset();
             buffer.putChar('\0');
             A=buffer.array();
@@ -52,6 +53,9 @@ public class USERLISTACK extends ACK {
                 bytes.add(temp);
             }
             buffer.reset();
+            */
+            bytes.add((byte)'\0');
+
         }
         return ListToArray();
     }

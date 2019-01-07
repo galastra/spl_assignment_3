@@ -94,7 +94,7 @@ public class FOLLOW extends Message {
 
     @Override
     public Message process(Client c, Connections<Message> connection, ConcurrentHashMap<String,Client> clients, ConcurrentLinkedQueue<Message> AllMessages) {
-        if(NumOfUsers==0)
+        if(NumOfUsers==0 || !c.getIsConncted())
             return new ERROR(Opcode);
         else
         {
@@ -103,8 +103,10 @@ public class FOLLOW extends Message {
                 LinkedList<String> succesfullFollow=new LinkedList<>();
 
                 for (String Name:UserNameList) {
-                    if(clients.containsKey(Name) && c.AddFollower(Name))
+                    if(clients.containsKey(Name) && c.AddFollowing(Name)) {
                         succesfullFollow.add(Name);
+                        clients.get(Name).AddFollower(c.getName());
+                    }
                 }
                 if(succesfullFollow.size()==0)
                     return new ERROR(Opcode);
@@ -116,8 +118,10 @@ public class FOLLOW extends Message {
                 LinkedList<String> succesfullUnFollow=new LinkedList<>();
 
                 for (String Name:UserNameList) {
-                    if(clients.containsKey(Name) && c.RemoveFollower(Name))
+                    if(clients.containsKey(Name) && c.removeFollowing(Name)) {
                         succesfullUnFollow.add(Name);
+                        clients.get(Name).RemoveFollower(Name);
+                    }
                 }
                 if(succesfullUnFollow.size()==0)
                     return new ERROR(Opcode);

@@ -41,6 +41,14 @@ public class Client {
         return true;
     }
 
+    public boolean removeFollowing(String name){
+        if(Following.contains(name))
+            Following.remove(name);
+        else
+            return false;
+        return true;
+    }
+
     public ConcurrentLinkedQueue<String> getFollowers() {
         return Followers;
     }
@@ -94,7 +102,6 @@ public class Client {
 
     public void setConnId(int connId) {
         this.connId = connId;
-        Name = ((Integer)connId).toString();
     }
 
     public void addMsg(Message msg){
@@ -102,5 +109,23 @@ public class Client {
     }
     public ConcurrentLinkedQueue<Message> getAppending_msgs(){
         return appending_msgs;
+    }
+
+    public void setClient(Client client)
+    {
+        this.Name=client.getName();
+        this.Password=client.Password;
+        this.Following=client.Following;
+        this.Followers=client.Followers;
+        this.NumPosts=client.NumPosts;
+        this.appending_msgs=client.appending_msgs;
+    }
+
+    public void clearPendingMsgs(){
+        appending_msgs.clear();
+    }
+
+    public void AddToNumPost(){
+        NumPosts++;
     }
 }

@@ -68,7 +68,7 @@ public class POST extends Message {
                     clients.get(Name).addMsg(new NOTIFICATION(false,c.getName(),Content));
             }
         }
-        for(String Name:c.getFollowing()){
+        for(String Name:c.getFollowers()){
             if(clients.containsKey(Name) & !UsersToNotify.contains(Name)) {
                 AllMessages.add(this);
                 if (clients.get(Name).getIsConncted())
@@ -77,6 +77,8 @@ public class POST extends Message {
                     clients.get(Name).addMsg(new NOTIFICATION(false,c.getName(),Content));
             }
         }
+        c.AddToNumPost();
+        clients.get(c.getName()).AddToNumPost();
         return new ACK(Opcode);
     }
 
